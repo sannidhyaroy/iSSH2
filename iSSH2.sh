@@ -114,6 +114,7 @@ export MIN_VERSION=
 export ARCHS=
 export SDK_PLATFORM=
 export EMBED_BITCODE="-fembed-bitcode"
+export OUTPUT_DIR=
 
 BUILD_OSX=false
 BUILD_SSL=true
@@ -140,6 +141,7 @@ while getopts 'a:p:l:o:v:s:x:t:h-' OPTION ; do
        case "$OPTION" in
          --archs) ARCHS="$OPTARG" ;;
          --platform) SDK_PLATFORM="$OPTARG" ;;
+         --output) OUTPUT_DIR="$OPTARG" ;;
          --openssl) LIBSSL_VERSION="$OPTARG" ;;
          --libssh2) LIBSSH_VERSION="$OPTARG" ;;
          --sdk-version) SDK_VERSION="$OPTARG" ;;
@@ -260,16 +262,36 @@ if [[ -z "$SDK_VERSION" ]]; then
    SDK_AUTO=true
 fi
 
-export BUILD_THREADS=$(sysctl hw.ncpu | awk '{print $2}')
+# ---- tool discovery ----
+BUILD_THREADS=$(sysctl hw.ncpu | awk '{print $2}')
+CLANG=$(xcrun --find clang)
+GCC=$(xcrun --find gcc)
+DEVELOPER=$(xcode-select --print-path)
 
-export CLANG=`xcrun --find clang`
-export GCC=`xcrun --find gcc`
-export DEVELOPER=`xcode-select --print-path`
+# ---- base path resolution ----
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-export BASEPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export TEMPPATH="$TMPDIR$SCRIPTNAME"
-export LIBSSLDIR="$TEMPPATH/openssl-$LIBSSL_VERSION"
-export LIBSSHDIR="$TEMPPATH/libssh2-$LIBSSH_VERSION"
+if [[ -n "$OUTPUT_DIR" ]]; then
+  mkdir -p "$OUTPUT_DIR"
+  BASEPATH="$(cd "$OUTPUT_DIR" && pwd)"
+else
+  BASEPATH="$SCRIPT_DIR"
+fi
+
+# ---- temp paths ----
+TEMPPATH="$TMPDIR$SCRIPTNAME"
+LIBSSLDIR="$TEMPPATH/openssl-$LIBSSL_VERSION"
+LIBSSHDIR="$TEMPPATH/libssh2-$LIBSSH_VERSION"
+
+# ---- export everything once ----
+export BUILD_THREADS
+export CLANG
+export GCC
+export DEVELOPER
+export BASEPATH
+export TEMPPATH
+export LIBSSLDIR
+export LIBSSHDIR
 
 #Env
 
