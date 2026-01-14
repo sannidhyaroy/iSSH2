@@ -44,6 +44,7 @@ Options:
   -o, --openssl=VERS        download and build OpenSSL version VERS
   -x, --xcodeproj=PATH      get info from the project (requires TARGET)
   -t, --target=TARGET       get info from the target (requires XCODEPROJ)
+      --output=OUTPUT_DIR   set output directory
       --build-only-openssl  build OpenSSL and skip Libssh2
       --no-clean            do not clean build folder
       --no-bitcode          don't embed bitcode
