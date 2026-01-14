@@ -29,7 +29,7 @@ version () {
   printf "%02d%02d%02d" ${1//./ }
 }
 
-source "$BASEPATH/iSSH2-commons"
+source "$SCRIPT_DIR/iSSH2-commons"
 
 set -e
 
